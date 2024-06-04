@@ -1,12 +1,39 @@
 #!ipxe
-###
-### netboot.xyz-custom menu
-###
 
-:start
-echo Hello world!
-sleep 10
-goto custom_exit
+goto ${menu} ||
 
-:custom_exit
+:live_menu
+set os ETHOS Live
+menu ${os}
+item --gap ${os} Versions
+item jammy ${space} ${os} 22.04
+item focal ${space} ${os} 20.04
+choose live_version || goto live_exit
+menu ${os} ${live_version}
+item --gap ${os} Flavors
+goto ${live_version}
+
+:jammy
+item ETHOS Live-Budgie-squash ${space} ETHOS Live
+goto flavor_select
+
+
+:flavor_select
+choose flavor || goto live_menu
+echo ${cls}
+goto ${flavor} ||
+
+:ETHOS Live
+set squash_url ${boot_domain}/ethos1.4/filesystem.squashfs  
+set kernel_url ${boot_domain}/ethos1.4/
+goto 22.04-boot
+
+:22.04-boot
+imgfree
+kernel ${kernel_url}vmlinuz ip=dhcp boot=casper netboot=url url=${squash_url} initrd=initrd.lz quiet toram fsck.mode=skip splash
+initrd ${kernel_url}initrd
+boot
+
+:live_exit
+clear menu
 exit 0
