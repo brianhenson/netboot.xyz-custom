@@ -3,7 +3,7 @@
 goto ${menu} ||
 
 :live_menu
-set os ETHOS Live
+set os ETHOSLive
 menu ${os}
 item --gap ${os} Versions
 item jammy ${space} ${os} 22.04
@@ -23,7 +23,7 @@ choose flavor || goto live_menu
 echo ${cls}
 goto ${flavor} ||
 
-:ETHOS Live
+:ETHOSLive
 set squash_url ${boot_domain}/ethos1.4/filesystem.squashfs  
 set kernel_url ${boot_domain}/ethos1.4/
 goto 22.04-boot
