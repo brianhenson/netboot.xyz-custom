@@ -1,39 +1,39 @@
 #!ipxe
+###
+### netboot.xyz-custom menu example
+###
 
-goto ${menu} ||
-
-:live_menu
-set os ETHOSLive
-menu ${os}
-item --gap ${os} Versions
-item jammy ${space} ${os} 22.04
-item focal ${space} ${os} 20.04
-choose live_version || goto live_exit
-menu ${os} ${live_version}
-item --gap ${os} Flavors
-goto ${live_version}
-
-:jammy
-item ETHOS Live-Budgie-squash ${space} ETHOS Live
-goto flavor_select
-
-
-:flavor_select
-choose flavor || goto live_menu
+:custom
+clear custom_choice
+menu This is a Test Menu
+item --gap This is the first sub menu
+item option_one ${space} Loading a kernel and initrd
+item option_two ${space} Loading an ISO
+choose custom_choice || goto custom_exit
 echo ${cls}
-goto ${flavor} ||
+goto ${custom_choice}
+goto custom_exit
 
-:ETHOSLive
-set squash_url ${boot_domain}/ethos1.4/filesystem.squashfs  
-set kernel_url ${boot_domain}/ethos1.4/
-goto 22.04-boot
+set squash_url http://boot.svc.brianhenson.tech/ethos1.4/filesystem.squashfs  
+set kernel_url http://boot.svc.brianhenson.tech/ethos1.4/
 
-:22.04-boot
-imgfree
+:option_one
+kernel http://boot.svc.brianhenson.tech/ethos1.4/filesystem.squashfs 
 kernel ${kernel_url}vmlinuz ip=dhcp boot=casper netboot=url url=${squash_url} initrd=initrd.lz quiet toram fsck.mode=skip splash
-initrd ${kernel_url}initrd
-boot
+initrd http://boot.svc.brianhenson.tech/ethos1.4/initrd.lz
 
-:live_exit
-clear menu
-exit 0
+imgargs vmlinuz put_kernel_img_args_here
+boot || goto custom_exit
+
+:option_two
+kernel https://boot.netboot.xyz/memdisk raw iso
+initrd http://boot.svc.brianhenson.tech/ethos1.4/ETHOS-1.4-desktop-amd64.iso
+boot || goto custom_exit
+
+:option_three
+echo Chains into another menu...
+chain https://raw.githubusercontent.com/${github_user}/netboot.xyz-custom/master/custom1.ipxe || goto custom
+
+:custom_exit
+chain utils.ipxe
+exit
